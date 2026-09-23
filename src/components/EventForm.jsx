@@ -78,8 +78,6 @@ function EventForm({ onAddEvent, editingEvent, onUpdateEvent, }) {
       onAddEvent(newEvent);
     }
 
-    onAddEvent(newEvent);
-
     setFormData({
       title: "",
       category: "",
