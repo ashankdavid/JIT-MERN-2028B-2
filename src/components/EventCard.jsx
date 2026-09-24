@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 function EventCard({
-  id,
+  _id,
   title,
   date,
   time,
@@ -12,11 +12,11 @@ function EventCard({
   onEditEvent,
 }) {
   function handleDeleteClick() {
-    onDeleteEvent(id);
+    onDeleteEvent(_id);
   }
 
   function handleEditClick(){
-    onEditEvent(id)
+    onEditEvent(_id)
   }
 
   return (
@@ -47,7 +47,7 @@ function EventCard({
 
       <Link
         className="details-button"
-        to={`/events/${id}`}
+        to={`/events/${_id}`}
       >
         View Details
       </Link>
