@@ -23,6 +23,11 @@ function Navbar() {
     return isActive ? "nav-link active-link" : "nav-link";
   }
 
+  function handleLogout(){
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }
+
   return (
     <nav className="navbar">
       <NavLink className="brand-name" to="/">
@@ -41,6 +46,15 @@ function Navbar() {
         <NavLink className={getNavLinkClass} to="/about">
           About
         </NavLink>
+        <NavLink className={getNavLinkClass} to="/login">
+          Login
+        </NavLink>
+        <NavLink className={getNavLinkClass} to="/register">
+          Register
+        </NavLink>
+        <button type="button" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </nav>
   );

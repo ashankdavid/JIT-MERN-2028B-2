@@ -8,6 +8,8 @@ const dns = require("dns");
 const Event = require("./models/Event");
 const User = require("./models/User");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const authMiddleware = require("./middleware/authMiddleware")
 
 app.use(cors());
 app.use(express.json());
@@ -30,7 +32,7 @@ app.get("/api/events", async (req, res)=>{
     res.json(events);
 })
 
-app.delete("/api/events/:id", async (req, res)=>{
+app.delete("/api/events/:id",authMiddleware, async (req, res)=>{
     const deletedEvent = await Event.findByIdAndDelete(
         req.params.id
     )
@@ -46,7 +48,7 @@ app.delete("/api/events/:id", async (req, res)=>{
     })
 })
 
-app.post("/api/events", async (req, res)=>{
+app.post("/api/events",authMiddleware, async (req, res)=>{
     const newEvent = await Event.create(req.body);
     res.json({
         message: "Event Added Successfully!",
@@ -54,7 +56,7 @@ app.post("/api/events", async (req, res)=>{
     });
 });
 
-app.put("/api/events/:id", async (req, res)=>{
+app.put("/api/events/:id",authMiddleware, async (req, res)=>{
     const updatedEvent = await Event.findByIdAndUpdate(
         req.params.id,
         req.body,
@@ -108,8 +110,23 @@ app.post("/api/login", async (req, res) =>{
             message: "Invalid Email or Password"
         });
     }
+
+    const token = jwt.sign(
+        {
+            userId: user._id,
+            email: user._email
+        },
+
+        process.env.JWT_SECRET,
+
+        {
+            expiresIn: "1h"
+        }
+    )
+
     res.json({
         message: "Login Successful!",
+        token: token,
         user: {
             id: user._id,
             name: user.name,
@@ -117,6 +134,13 @@ app.post("/api/login", async (req, res) =>{
         }
     });
 });
+
+app.get("/api/profile", authMiddleware, (req, res)=>{
+    res.json({
+        message: "You are Authenticated",
+        user: req.user
+    });
+})
 
 app.listen(5000, ()=>{
     console.log("Server is running on port 5000");
