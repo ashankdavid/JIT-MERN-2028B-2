@@ -6,6 +6,8 @@ const mongoose = require("mongoose");
 const app = express();
 const dns = require("dns");
 const Event = require("./models/Event");
+const User = require("./models/User");
+const bcrypt = require("bcryptjs");
 
 app.use(cors());
 app.use(express.json());
@@ -68,6 +70,51 @@ app.put("/api/events/:id", async (req, res)=>{
     res.json({
         message:"Event Updated Successfully!",
         event: updatedEvent
+    });
+});
+
+app.post("/api/register", async (req, res) =>{
+    const { name, email, password } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+        name, email, password: hashedPassword
+    });
+
+    await newUser.save();
+
+    res.json({
+        message: "User Registered Successfully!",
+        user: newUser
+    });
+});
+
+app.post("/api/login", async (req, res) =>{
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if(!user){
+        return res.status(401).json({
+            message: "Invalid Email or Password"
+        });
+    }
+
+    const passwordMatch = await bcrypt.compare(
+        password, user.password
+    )
+    if(!passwordMatch){
+        return res.status(401).json({
+            message: "Invalid Email or Password"
+        });
+    }
+    res.json({
+        message: "Login Successful!",
+        user: {
+            id: user._id,
+            name: user.name,
+            email: user.email
+        }
     });
 });
 
